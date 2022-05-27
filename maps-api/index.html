@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<!--
+ @license
+ Copyright 2019 Google LLC. All Rights Reserved.
+ SPDX-License-Identifier: Apache-2.0
+
+
+Modified J Howells 25.05.2021
+IDE Group 1
+Dyson School of Design Engineering
+
+-->
+<html>
+
+  <head>
+    <title>Directions Service</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+    <script src="scripts.js"></script>
+    <link rel="stylesheet" href="main.css">
+  </head>
+
+  <body>
+    <div id="floating-panel">
+      <b>Start: </b>
+      <select id="start">
+        <option value="dyson school of design engineering">Dyson</option>
+        <option value="Earls Court">Earl's Court</option>
+        <option value="Buckingham Palace">Buckingham Palace</option>
+        <option value="Brighton and Hove">Brighton and Hove</option>
+        <option value="Lands End">Land's End</option>
+        <option value="Darlington">Darlington</option>
+        <option value="Dulverton">Dulverton</option>
+        <option value="Middlesborough">Middlesborough</option>
+        <option value="great langdale">Great Langdale</option>
+        <option value="Edale">Edale</option>
+        <option value="Michaelchurch Escley">Michaelchurch Escley</option>
+        <option value="Glasgow">Glasgow</option>
+      </select>
+      <b>End: </b>
+      <select id="end">
+        <option value="dyson school of design engineering">Dyson</option>
+        <option value="Earls Court">Earl's Court</option>
+        <option value="Buckingham Palace">Buckingham Palace</option>
+        <option value="Brighton and Hove">Brighton and Hove</option>
+        <option value="Lands End">Land's End</option>
+        <option value="Darlington">Darlington</option>
+        <option value="Dulverton">Dulverton</option>
+        <option value="Middlesborough">Middlesborough</option>
+        <option value="great langdale">Great Langdale</option>
+        <option value="Edale">Edale</option>
+        <option value="Michaelchurch Escley">Michaelchurch Escley</option>
+        <option value="Glasgow">Glasgow</option>
+      </select>
+    </div>
+    <div id="map"></div>
+
+    <!-- 
+     The `defer` attribute causes the callback to execute after the full HTML
+     document has been parsed. For non-blocking uses, avoiding race conditions,
+     and consistent behavior across browsers, consider loading using Promises
+     with https://www.npmjs.com/package/@googlemaps/js-api-loader.
+    -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&callback=initMap&v=weekly" defer></script>
+  </body>
+
+</html>
+
+
