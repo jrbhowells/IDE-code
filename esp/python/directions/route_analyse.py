@@ -7,14 +7,23 @@ Dyson School of Design Engineering
 26/5/2022
 '''
 
-# from machine import Pin, ADC, PWM
+from machine import Pin, ADC, PWM
 import time
 import math
 
-from matplotlib.pyplot import close
 import gps_utils
 import buzz_utils
-from vec_utils import createVector, vectorMag, distanceTo, angleBetween, findClosest
+import getter
+from vec_utils import createVector, vectorMag, angleBetween, findClosest
+
+# Check GPS mode (DUMMY vs GPS)
+if str(getter.ioGet('ide-1')) == "GPS":
+    from gps_utils import GPSInit
+    from gps_utils import GPSRead
+else:
+    from gps_utils import dummyInit as GPSInit
+    from gps_utils import dummyRead as GPSRead
+
 
 with open("directions.txt", 'r') as file:
     data = file.read()
@@ -34,17 +43,17 @@ for i in range(2):
         for k in range(len(data[i][j])):
             data[i][j][k] = float(data[i][j][k])
 
-gps_utils.GPSInit()
-prev_loc = gps_utils.GPSRead()
+GPSInit()
+prev_loc = GPSRead()
 
 cmd_ptr = 0
 dir20 = dir100 = False
 
-buzz_utils.alert("ready")
+buzz_utils.alertUser("ready")
 
 while (True):
     # Get location
-    current_loc = gps_utils.GPSRead()
+    current_loc = GPSRead()
 
     # If user is less than 20m from target
     if (vectorMag(createVector(data[0][-1], current_loc)) < 20):

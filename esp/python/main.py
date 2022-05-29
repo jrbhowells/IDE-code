@@ -3,10 +3,11 @@ from machine import Pin, SoftI2C, UART
 from micropyGPS import MicropyGPS
 import time
 import initpy
+import getter
 
-initpy.Wifi_Connect()
+initpy.WifiConnect()
 
-file = 'gps.py'
+file = 'capacitive_buzz.py'
 
 print(file)
 
