@@ -14,7 +14,7 @@ import math
 import gps_utils
 import buzz_utils
 import getter
-from vec_utils import createVector, vectorMag, angleBetween, findClosest
+from vec_utils import createVector, vectorMag, angleBetween, findClosest, sideOf
 
 # Check GPS mode (DUMMY vs GPS)
 if str(getter.ioGet('ide-1')) == "GPS":
@@ -43,8 +43,7 @@ for i in range(2):
         for k in range(len(data[i][j])):
             data[i][j][k] = float(data[i][j][k])
 
-GPSInit()
-prev_loc = GPSRead()
+prev_loc = GPSInit()
 
 cmd_ptr = 0
 dir20 = dir100 = False
@@ -55,8 +54,10 @@ while (True):
     # Get location
     current_loc = GPSRead()
 
+    vec_to_end = createVector(current_loc, data[0][-1])
+
     # If user is less than 20m from target
-    if (vectorMag(createVector(data[0][-1], current_loc)) < 20):
+    if (vectorMag(vec_to_end) * 111111) < 20:
         buzz_utils.alertUser("arrived")
         break
 
@@ -70,50 +71,52 @@ while (True):
     '''
 
     # Create user's direction vector
-    motion_vec = createVector(current_loc, prev_loc)
-
-    # Find distance to next command point
-    dist = vectorMag(createVector(data[1][cmd_ptr], current_loc))
+    motion_vec = createVector(prev_loc, current_loc)
     
-    if (dist < 100):
-        # Find coordinate closest to command point from data[1]
-        close_ptr = findClosest(data[0][cmd_ptr], data[1])
+    if prev_loc != current_loc:
+        cmd_point = data[0][cmd_ptr]
 
-        # If the closest point is the last point:
-        if (close_ptr == len(data[1])):
-            # Create command vector to last point
-            cmd_vec = createVector(data[1][-1], current_loc)
+        # If command point is behind
+        if(angleBetween(motion_vec, createVector(current_loc, cmd_point)) > 160):
+            dir20 = dir100 = False
+            cmd_ptr += 1
+            cmd_point = data[0][cmd_ptr]
+
+        # Find distance to next command point
+        dist_to_cmd = vectorMag(createVector(current_loc, cmd_point)) * 111111
+
+        # If the next command point is the last:
+        if cmd_ptr == len(data[0]):
+            # Set command vector to last point
+            cmd_vec = vec_to_end
 
         else:
+            # Find coordinate closest to command point from data[1]
+            close_ptr = findClosest(cmd_point, data[1]) + 1
+
             # Create command vector along next path
-            cmd_vec = createVector(data[1][close_ptr+1], data[0][cmd_ptr])
-        
-        # Find distance to next command point
-        dist = vectorMag(cmd_vec)
+            cmd_vec = createVector(cmd_point, data[1][close_ptr])
         
         # Calculate angle between motion and command vectors
-        angle = angleBetween(motion_vec, cmd_vec)
+        angle = angleBetween(cmd_vec, motion_vec)
 
         # Calculate which side angle is on
-        '''###########'''
+        side = sideOf(cmd_vec, motion_vec)
 
-    # If command point is behind
-    if(angle > 160):
-        dir20 = dir100 = False
-        cmd_ptr += 1
+        
 
-    # If command point is < 20m ahead
-    elif(dist < 20 and dir20 == False):
-        dir20 = True
-        buzz_utils.directUser(side, angle)
+        # If command point is < 20m ahead
+        if(dist_to_cmd < 20 and dir20 == False):
+            dir20 = True
+            buzz_utils.directUser(side, angle)
 
-    # If command point is 20 < D < 100m ahead
-    elif(dist < 100 and dir100 == False):
-        dir100 = True
-        buzz_utils.directUser(side, angle)
+        # If command point is 20 < D < 100m ahead
+        elif(dist_to_cmd < 100 and dir100 == False):
+            dir100 = True
+            buzz_utils.directUser(side, angle)
 
-    # Save current as previous location
-    prev_loc = current_loc
+        # Save current as previous location
+        prev_loc = current_loc
 
 
 '''
@@ -130,14 +133,16 @@ THEORY:
 4. Find distance to next command point
 
     4.0. If user is less than 100m from command point
-        1. Find coordinate closest to command point from data[1]
 
-        2. If closest point == last point,
+        1. If cmd_point is last cmd_point,
             1. Guide user to last point
 
-        3. Else:
-            1. Create command vector: nextPoint-cmdPoint.
-            2. Calculate angle between direction and command vectors (dot product)
+        2. Else:
+            1. Find coordinate closest to command point from data[1]
+            2. Create command vector: nextPoint-cmdPoint.
+
+        3. Calculate angle between direction and command vectors (dot product)
+        4. Calculate direction of turn
 
     4.1. If user is past command point (angle to command point > 160deg):
         1. Set dir100 = dir20 = False

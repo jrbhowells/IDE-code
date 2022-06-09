@@ -23,6 +23,7 @@ def p5():
 value = oldVal = RoldVal = str(getter.ioGetWithID('buzz-test'))
 
 while (True):
+    value = str(getter.ioGetWithID('buzz-test'))
 
     if oldVal != value and oldVal != RoldVal:
         if value == 1:

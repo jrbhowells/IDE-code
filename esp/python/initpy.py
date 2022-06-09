@@ -1,6 +1,7 @@
 import network
 from machine import Pin, ADC, PWM
 import time
+import getter
 
 
 def WifiConnect():
@@ -12,8 +13,13 @@ def WifiConnect():
 
     station.connect("JH-TCD", "ogler8774")
 
+    print('Connecting WiFi... ', end="")
+
     while not station.isconnected():
-        print(".", end="")
+        print("", end="")
+    
+    print("WiFi Connected.")
+    getter.ioPost("WiFi Connected.", 'ide-terminal')
 
     led.value(1)
     time.sleep(1)

@@ -29,12 +29,29 @@ try:
 except Exception as e:
     print(e)'''
 
+'''
 try:
     r = requests.get(url + "/last", headers=headers)
     data = r.json()
     print(data["value"])
 except Exception as e:
     print(e)
+'''
+
+data = 0.1
+co = [50, 0]
+feed = 'ide-progress'
+
+headers = {'X-AIO-Key': "aio_qroT33zlvhHthcQDt9sQhLEyft4I", 'Content-Type': 'application/json'}
+url = 'https://io.adafruit.com/api/v2/jrbhowells/feeds/' + feed + '/data'
+
+cont = {'value': data, 'lat': co[0], 'lon': co[1]}
+
+try:
+    r = requests.post(url, json=cont, headers=headers)
+    print(r.text)
+except Exception as e:
+    print("Not posted to IDE-Progress: " + e)
 
 
 '''

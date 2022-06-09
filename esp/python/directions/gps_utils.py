@@ -13,7 +13,7 @@ def handleReturn():
     global pts
     global ptr
 
-    getter.ioPostWithCo(ptr/len(pts), pts[ptr], 'ide-progress')
+    getter.ioPostWithCo(ptr/len(pts) * 100, pts[ptr], 'ide-progress')
 
 # Initialise GPS
 def GPSInit():
@@ -32,11 +32,10 @@ def dummyInit():
     global ptr
     global value
     global oldVal
-    global RoldVal
 
-    value = oldVal = RoldVal = str(getter.ioGetWithID('buzz-test'))
+    value = oldVal = str(getter.ioGetWithID('ide-dummy-advance'))
 
-    ptr = 0
+    ptr = 1
 
     with open('sample-cycle.txt', 'r') as f:
         pts = f.readlines()
@@ -50,6 +49,10 @@ def dummyInit():
 
         for j in range(len(pts[i])):
             pts[i][j] = float(pts[i][j])
+    
+    handleReturn()
+    
+    return pts[0]
 
 
 # Return dummy [lat, lon] object from sample-cycle.txt
@@ -58,15 +61,13 @@ def dummyRead():
     global ptr
     global value
     global oldVal
-    global RoldVal
 
-    value = str(getter.ioGetWithID('buzz-test'))
+    value = str(getter.ioGetWithID('ide-dummy-advance'))
 
-    if oldVal != value and oldVal != RoldVal:
+    if oldVal != value:
         ptr += 1
         handleReturn()
 
-    RoldVal = oldVal
     oldVal = value
 
     return pts[ptr]
